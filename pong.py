@@ -101,8 +101,8 @@ def draw(canvas, client_socket):
         ball_vel[0] = -ball_vel[0]
         ball_vel[0] *= 1.1
         ball_vel[1] *= 1.1
-        print('{x:' + str(ball_pos[0]) + ', y:' + str(ball_pos[1]) + '}')
-        client_socket.send('{x:' + str(ball_pos[0]) + ', y:' + str(ball_pos[1]) + '}'.encode('utf-8'))
+        print(str('{x:' + str(ball_pos[0]) + ', y:' + str(ball_pos[1]) + '}'))
+        client_socket.send(str('{x:' + str(ball_pos[0]) + ', y:' + str(ball_pos[1]) + '}').encode('utf-8'))
     elif int(ball_pos[0]) <= BALL_RADIUS + PAD_WIDTH:
         client_socket.send('Paddle One Point'.encode('utf-8'))
         ball_init(True)
@@ -111,8 +111,8 @@ def draw(canvas, client_socket):
         ball_vel[0] = -ball_vel[0]
         ball_vel[0] *= 1.1
         ball_vel[1] *= 1.1
-        print('{x:' + str(ball_pos[0]) + ', y:' + str(ball_pos[1]) + '}')
-        client_socket.send('{x:' + str(ball_pos[0]) + ', y:' + str(ball_pos[1]) + '}'.encode('utf-8'))
+        print(str('{x:' + str(ball_pos[0]) + ', y:' + str(ball_pos[1]) + '}'))
+        client_socket.send(str('{x:' + str(ball_pos[0]) + ', y:' + str(ball_pos[1]) + '}').encode('utf-8'))
     elif int(ball_pos[0]) >= WIDTH + 1 - BALL_RADIUS - PAD_WIDTH:
         client_socket.send('Paddle Two Point'.encode('utf-8'))
         ball_init(False)    
