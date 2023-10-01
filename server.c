@@ -29,17 +29,22 @@ int main(int argc, char const* argv[]){
 	address.sin_family = AF_INET;
 	address.sin_addr.s_addr = INADDR_ANY;
 	address.sin_port = htons(PORT);
-
+	printf(format_string, "HOLA1\n");
+	fflush(stdout);
 	if (bind(server_fd, (struct sockaddr*)&address,
 			sizeof(address))
 		< 0) {
 		perror("bind failed");
 		exit(EXIT_FAILURE);
 	}
+	printf(format_string, "HOLA2\n");
+	fflush(stdout);
 	if (listen(server_fd, 3) < 0) {
 		perror("listen");
 		exit(EXIT_FAILURE);
 	}
+	printf(format_string, "HOLA3\n");
+	fflush(stdout);
 	if ((new_socket
 		= accept(server_fd, (struct sockaddr*)&address,
 				(socklen_t*)&addrlen))
@@ -47,7 +52,10 @@ int main(int argc, char const* argv[]){
 		perror("accept");
 		exit(EXIT_FAILURE);
 	}
+	printf(format_string, "HOLA4\n");
     while(read(new_socket, buffer_received, 1024)){
+		printf("fasdfsadfsa\n");
+		fflush(stdout);
         printf(format_string, buffer_received);
         send(new_socket, "Hola python", strlen(hello), 0);
     }
