@@ -14,6 +14,7 @@ int main(int argc, char const* argv[]){
 	int addrlen = sizeof(address);
 	char buffer_received[1024] = { 0 };
 	char* hello = "Hello from server";
+	int connected_clients = 0;
 
 	if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
 		perror("socket failed");
@@ -40,13 +41,14 @@ int main(int argc, char const* argv[]){
 		perror("listen");
 		exit(EXIT_FAILURE);
 	}
-	if ((new_socket
-		= accept(server_fd, (struct sockaddr*)&address,
-				(socklen_t*)&addrlen))
-		< 0) {
+	if ((new_socket = accept(server_fd, (struct sockaddr*)&address, (socklen_t*)&addrlen))< 0) {
 		perror("accept");
 		exit(EXIT_FAILURE);
 	}
+
+	connected_clients++;
+	// send(new_socket, "[0,0]", strlen(hello), 0);
+
     while(read(new_socket, buffer_received, 1024)){
         printf(format_string, buffer_received);
         send(new_socket, "Hola python", strlen(hello), 0);
