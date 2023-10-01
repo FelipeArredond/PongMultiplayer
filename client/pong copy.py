@@ -39,7 +39,7 @@ pygame.display.set_caption('Hello World')
 
 server_response_event = threading.Event()
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-server_address = ('localhost', 8081)
+server_address = ('localhost', 8080)
 
 
 def close_threads():
