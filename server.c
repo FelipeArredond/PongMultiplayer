@@ -14,6 +14,7 @@ int main(int argc, char const* argv[]){
 	int addrlen = sizeof(address);
 	char buffer_received[1024] = { 0 };
 	char* hello = "Hello from server";
+	int connected_clients = 0;
 
 	if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
 		perror("socket failed");
