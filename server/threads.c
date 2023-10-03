@@ -8,7 +8,7 @@
 #include <arpa/inet.h>
 #include <fcntl.h>
 
-#define SERVER_PORT 8085
+#define SERVER_PORT 8080
 #define MAXLINE 4096
 #define format_string "%s\n"
 
@@ -33,8 +33,8 @@ typedef struct
 } Game;
 
 void *handle_game(void *args);
-void init_ball_velocity(Data *ball_vel, int right);
-void send_ball_velocity_init(int socket_a, int socket_b, char type[], Data ball_vel_a);
+void initBallVelocity(Data *ballData, int right);
+void sendBallVelocity(int socket1, int socket2, char type[], Data ballData);
 
 int main(int argc, char const *argv[])
 {
@@ -61,7 +61,7 @@ int main(int argc, char const *argv[])
 
     if (listen(listenfd, 10) < 0)
     {
-        perror("listen failed");
+        perror("Listen failed");
         close(listenfd);
         exit(EXIT_FAILURE);
     }
@@ -112,59 +112,62 @@ void *handle_game(void *args) {
     Player player1 = game.player1;
     Player player2 = game.player2;
 
-	char buffer_received_a[1024] = { 0 };
-    char buffer_received_b[1024] = { 0 };
-
-    printf("Player 1: %s\n", player1.address);
-    printf("Player 2: %s\n", player2.address);
+	char bufferPlayer1[1024] = { 0 };
+    char bufferPlayer2[1024] = { 0 };
 
     // Establecer el socket en modo no bloqueante
-    int flags_a = fcntl(player1.socket, F_GETFL, 0);
-    fcntl(player1.socket, F_SETFL, flags_a | O_NONBLOCK);
-    int flags_b = fcntl(player2.socket, F_GETFL, 0);
-    fcntl(player2.socket, F_SETFL, flags_b | O_NONBLOCK);
+    // int flags_a = fcntl(player1.socket, F_GETFL, 0);
+    // fcntl(player1.socket, F_SETFL, flags_a | O_NONBLOCK);
+    // int flags_b = fcntl(player2.socket, F_GETFL, 0);
+    // fcntl(player2.socket, F_SETFL, flags_b | O_NONBLOCK);
+
+    fcntl(player1.socket, F_SETFL, O_NONBLOCK);
+    fcntl(player2.socket, F_SETFL, O_NONBLOCK);
 
     srand(time(NULL));
-    Data ball_velocity;
-    // init_ball_velocity(&ball_velocity, (rand()%2));
-    init_ball_velocity(&ball_velocity, 0);
-    send_ball_velocity_init(player1.socket, player2.socket, "ball_start", ball_velocity);
+    Data ballData;
+
+    initBallVelocity(&ballData, 0);
+    sendBallVelocity(player1.socket, player2.socket, "ball_start", ballData);
     fflush(stdout);
 
 	while (1) {
         // Leer datos del cliente A
-        int bytes_read_a = read(player1.socket, buffer_received_a, sizeof(buffer_received_a));
+        memset(bufferPlayer1, 0, sizeof(bufferPlayer1));
+        int bytesRead1 = read(player1.socket, bufferPlayer1, sizeof(bufferPlayer1));
+
         // Leer datos del cliente B
-        int bytes_read_b = read(player2.socket, buffer_received_b, sizeof(buffer_received_b));
-        if(bytes_read_a == 0 || bytes_read_b == 0){
-            close(player1.socket);
-            close(player2.socket);
+        memset(bufferPlayer2, 0, sizeof(bufferPlayer2));
+        int bytesRead2 = read(player2.socket, bufferPlayer2, sizeof(bufferPlayer2));
+
+        if(bytesRead1 == 0 || bytesRead2 == 0){
             break;
         }
-        if (bytes_read_a > 0) {
-            printf(format_string, buffer_received_a);
-            if(strcmp(buffer_received_a, "point_made") == 0){
-                init_ball_velocity(&ball_velocity, (rand()%2));
-                send_ball_velocity_init(player1.socket, player2.socket, "ball_start", ball_velocity);
+        
+        if (bytesRead1 > 0) {
+            //printf(format_string, bufferPlayer1);
+            if(strcmp(bufferPlayer1, "point_made") == 0){
+                initBallVelocity(&ballData, (rand()%2));
+                sendBallVelocity(player1.socket, player2.socket, "ball_start", ballData);
                 continue;
             }
             // Enviar datos del cliente A al cliente B
-            printf(format_string, "A -> B");
-            fflush(stdout);
-            send(player2.socket, buffer_received_a, bytes_read_a, 0);
+            //printf(format_string, "A -> B");
+            //fflush(stdout);
+            send(player2.socket, bufferPlayer1, bytesRead1, 0);
         }
 
-        if (bytes_read_b > 0) {
-            printf(format_string, buffer_received_b);
-            if(strcmp(buffer_received_b, "point_made") == 0){
-                init_ball_velocity(&ball_velocity, (rand()%2));
-                send_ball_velocity_init(player1.socket, player2.socket, "ball_start", ball_velocity);
+        if (bytesRead2 > 0) {
+            //printf(format_string, bufferPlayer2);
+            if(strcmp(bufferPlayer2, "point_made") == 0){
+                initBallVelocity(&ballData, (rand()%2));
+                sendBallVelocity(player1.socket, player2.socket, "ball_start", ballData);
                 continue;
             }
             // Enviar datos del cliente B al cliente A
-            printf(format_string, "B -> A");
-            fflush(stdout);
-            send(player1.socket, buffer_received_b, bytes_read_b, 0);
+            //printf(format_string, "B -> A");
+            //fflush(stdout);
+            send(player1.socket, bufferPlayer2, bytesRead2, 0);
         }
     }
 
@@ -173,24 +176,25 @@ void *handle_game(void *args) {
     return NULL;
 }
 
-void init_ball_velocity(Data *ball_vel, int right) {
-    ball_vel->horizontal = rand() % 3 + 2;  // Genera un número entre 2 y 4
-    ball_vel->vertical = rand() % 2 + 1;    // Genera un número entre 1 y 2
+void initBallVelocity(Data *ballData, int right) {
+    ballData->horizontal = rand() % 3 + 2;  // Genera un número entre 2 y 4
+    ballData->vertical = rand() % 2 + 1;    // Genera un número entre 1 y 2
     
     if (!right) {
-        ball_vel->horizontal = -ball_vel->horizontal;
+        ballData->horizontal = -ballData->horizontal;
     }
 }
 
-void send_ball_velocity_init(int socket_a, int socket_b, char type[], Data ball_vel_a) {
-    char encodedData_a[100];
-    char encodedData_b[100];
-    Data ball_vel_b = ball_vel_a;
-    ball_vel_b.horizontal = -ball_vel_b.horizontal;
+void sendBallVelocity(int socket1, int socket2, char type[], Data ballData) {
+    char encodedData1[100];
+    char encodedData2[100];
 
-    snprintf(encodedData_a, sizeof(encodedData_a), "%s;%d;%d", type, ball_vel_a.horizontal, ball_vel_a.vertical);
-    snprintf(encodedData_b, sizeof(encodedData_b), "%s;%d;%d", type, ball_vel_b.horizontal, ball_vel_b.vertical);
+    Data ballData2 = ballData;
+    ballData2.horizontal = -ballData2.horizontal;
+
+    snprintf(encodedData1, sizeof(encodedData1), "%s;%d;%d", type, ballData.horizontal, ballData.vertical);
+    snprintf(encodedData2, sizeof(encodedData2), "%s;%d;%d", type, ballData2.horizontal, ballData2.vertical);
     // Envía la información de ball_vel a ambos sockets
-    send(socket_a, encodedData_a, strlen(encodedData_a), 0);
-    send(socket_b, encodedData_b, strlen(encodedData_b), 0);
+    send(socket1, encodedData1, strlen(encodedData1), 0);
+    send(socket2, encodedData2, strlen(encodedData2), 0);
 }
