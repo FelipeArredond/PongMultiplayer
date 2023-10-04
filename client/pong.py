@@ -36,7 +36,8 @@ pygame.display.set_caption('Pong Game')
 
 server_response_event = threading.Event()
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-server_address = ('localhost', 8080)
+server_address = ('44.201.112.24', 8080)
+# server_address = ('localhost', 8080)
 
 def close_threads():
     global THREADS_ARE_RUNNING
@@ -57,12 +58,15 @@ def receive_data_from_server():
         response = client_socket.recv(1024)
 
         dataDecoded = response.decode()
-        #print(f'Data recieved: {dataDecoded}')
+        print(f'Data recieved: {dataDecoded}')
         type, x, y = dataDecoded.split(';')
         if type == 'ball_start':
+            print(f'X: {x}')
+            print(f'Y: {y}')
             ball_init([float(x), float(y)])  # horizontal, vertical
             server_response_event.set()
         elif type == 'paddle_move':
+            print(f'Enemy Y: {y}')
             enemy_paddle_pos = [float(x), float(y)]  # x, y
 
 #keydown handler

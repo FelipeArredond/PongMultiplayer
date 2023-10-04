@@ -112,8 +112,8 @@ void *handle_game(void *args) {
     Player player1 = game.player1;
     Player player2 = game.player2;
 
-	char bufferPlayer1[23] = { 0 };
-    char bufferPlayer2[23] = { 0 };
+	char bufferPlayer1[24] = { 0 };
+    char bufferPlayer2[24] = { 0 };
 
     // Establecer el socket en modo no bloqueante
     // int flags_a = fcntl(player1.socket, F_GETFL, 0);
@@ -155,6 +155,7 @@ void *handle_game(void *args) {
             printf(format_string, "A -> B");
             fflush(stdout);
             send(player2.socket, bufferPlayer1, bytesRead1, 0);
+            memset(bufferPlayer1, 0, sizeof(bufferPlayer1));
         }
 
         if (bytesRead2 > 0) {
@@ -168,6 +169,7 @@ void *handle_game(void *args) {
             printf(format_string, "B -> A");
             fflush(stdout);
             send(player1.socket, bufferPlayer2, bytesRead2, 0);
+            memset(bufferPlayer1, 0, sizeof(bufferPlayer2));
         }
     }
 
