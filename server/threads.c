@@ -112,8 +112,8 @@ void *handle_game(void *args) {
     Player player1 = game.player1;
     Player player2 = game.player2;
 
-	char bufferPlayer1[24] = { 0 };
-    char bufferPlayer2[24] = { 0 };
+	char bufferPlayer1[23] = { 0 };
+    char bufferPlayer2[23] = { 0 };
 
     // Establecer el socket en modo no bloqueante
     // int flags_a = fcntl(player1.socket, F_GETFL, 0);
