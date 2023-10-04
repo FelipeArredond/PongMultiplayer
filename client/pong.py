@@ -36,8 +36,8 @@ pygame.display.set_caption('Pong Game')
 
 server_response_event = threading.Event()
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-server_address = ('44.201.112.24', 8080)
-# server_address = ('localhost', 8080)
+# server_address = ('44.201.112.24', 8080)
+server_address = ('localhost', 8080)
 
 def close_threads():
     global THREADS_ARE_RUNNING
