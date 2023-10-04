@@ -3,6 +3,7 @@ import pygame, sys
 from pygame.locals import *
 import threading
 import atexit
+import re
 
 pygame.init()
 fps = pygame.time.Clock()
@@ -66,6 +67,7 @@ def receive_data_from_server():
             ball_init([float(x), float(y)])  # horizontal, vertical
             server_response_event.set()
         elif type == 'paddle_move':
+            y = re.sub(r'[a-zA-Z]', '', y)
             print(f'Enemy Y: {y}')
             enemy_paddle_pos = [float(x), float(y)]  # x, y
 
