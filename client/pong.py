@@ -37,8 +37,8 @@ pygame.display.set_caption('Pong Game')
 
 server_response_event = threading.Event()
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-# server_address = ('44.201.112.24', 8080)
-server_address = ('localhost', 8080)
+server_address = ('44.201.112.24', 8080)
+# server_address = ('localhost', 8080)
 
 def close_threads():
     global THREADS_ARE_RUNNING
@@ -56,7 +56,7 @@ def ball_init(ball_vel_init):
 def receive_data_from_server():
     global enemy_paddle_pos, THREADS_ARE_RUNNING
     while THREADS_ARE_RUNNING:
-        response = client_socket.recv(1024)
+        response = client_socket.recv(24)
 
         dataDecoded = response.decode()
         print(f'Data recieved: {dataDecoded}')
