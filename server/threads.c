@@ -112,8 +112,8 @@ void *handle_game(void *args) {
     Player player1 = game.player1;
     Player player2 = game.player2;
 
-	char bufferPlayer1[1024] = { 0 };
-    char bufferPlayer2[1024] = { 0 };
+	char bufferPlayer1[24] = { 0 };
+    char bufferPlayer2[24] = { 0 };
 
     // Establecer el socket en modo no bloqueante
     // int flags_a = fcntl(player1.socket, F_GETFL, 0);
@@ -145,15 +145,15 @@ void *handle_game(void *args) {
         }
         
         if (bytesRead1 > 0) {
-            //printf(format_string, bufferPlayer1);
+            printf(format_string, bufferPlayer1);
             if(strcmp(bufferPlayer1, "point_made") == 0){
                 initBallVelocity(&ballData, (rand()%2));
                 sendBallVelocity(player1.socket, player2.socket, "ball_start", ballData);
                 continue;
             }
             // Enviar datos del cliente A al cliente B
-            //printf(format_string, "A -> B");
-            //fflush(stdout);
+            printf(format_string, "A -> B");
+            fflush(stdout);
             send(player2.socket, bufferPlayer1, bytesRead1, 0);
         }
 
@@ -165,8 +165,8 @@ void *handle_game(void *args) {
                 continue;
             }
             // Enviar datos del cliente B al cliente A
-            //printf(format_string, "B -> A");
-            //fflush(stdout);
+            printf(format_string, "B -> A");
+            fflush(stdout);
             send(player1.socket, bufferPlayer2, bytesRead2, 0);
         }
     }
