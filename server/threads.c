@@ -128,7 +128,7 @@ void *handle_game(void *args) {
     Data ballData;
 
     initBallVelocity(&ballData, 0);
-    sendBallVelocity(player1.socket, player2.socket, "bs", ballData);
+    sendBallVelocity(player1.socket, player2.socket, "bs|", ballData);
     fflush(stdout);
 
 	while (1) {
@@ -148,7 +148,7 @@ void *handle_game(void *args) {
             printf(format_string, bufferPlayer1);
             if(strstr(bufferPlayer1, "pmd")!= NULL){
                 initBallVelocity(&ballData, (rand()%2));
-                sendBallVelocity(player1.socket, player2.socket, "bs", ballData);
+                sendBallVelocity(player1.socket, player2.socket, "bs|", ballData);
                 memset(bufferPlayer1, 0, sizeof(bufferPlayer1));
                 continue;
             }
@@ -162,7 +162,7 @@ void *handle_game(void *args) {
             //printf(format_string, bufferPlayer2);
             if(strstr(bufferPlayer2, "pmd") != NULL){
                 initBallVelocity(&ballData, (rand()%2));
-                sendBallVelocity(player1.socket, player2.socket, "bs", ballData);
+                sendBallVelocity(player1.socket, player2.socket, "bs|", ballData);
                 memset(bufferPlayer1, 0, sizeof(bufferPlayer2));
                 continue;
             }
