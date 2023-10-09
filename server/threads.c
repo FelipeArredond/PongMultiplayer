@@ -128,7 +128,7 @@ void *handle_game(void *args) {
     Data ballData;
 
     initBallVelocity(&ballData, 0);
-    sendBallVelocity(player1.socket, player2.socket, "bs|", ballData);
+    sendBallVelocity(player1.socket, player2.socket, "bs", ballData);
     fflush(stdout);
 
 	while (1) {
@@ -148,7 +148,7 @@ void *handle_game(void *args) {
             printf(format_string, bufferPlayer1);
             if(strstr(bufferPlayer1, "pmd")!= NULL){
                 initBallVelocity(&ballData, (rand()%2));
-                sendBallVelocity(player1.socket, player2.socket, "bs|", ballData);
+                sendBallVelocity(player1.socket, player2.socket, "bs", ballData);
                 memset(bufferPlayer1, 0, sizeof(bufferPlayer1));
                 continue;
             }
@@ -162,7 +162,7 @@ void *handle_game(void *args) {
             //printf(format_string, bufferPlayer2);
             if(strstr(bufferPlayer2, "pmd") != NULL){
                 initBallVelocity(&ballData, (rand()%2));
-                sendBallVelocity(player1.socket, player2.socket, "bs|", ballData);
+                sendBallVelocity(player1.socket, player2.socket, "bs", ballData);
                 memset(bufferPlayer1, 0, sizeof(bufferPlayer2));
                 continue;
             }
@@ -194,8 +194,8 @@ void sendBallVelocity(int socket1, int socket2, char type[], Data ballData) {
     Data ballData2 = ballData;
     ballData2.horizontal = -ballData2.horizontal;
 
-    snprintf(encodedData1, sizeof(encodedData1), "%s;%d;%d", type, ballData.horizontal, ballData.vertical);
-    snprintf(encodedData2, sizeof(encodedData2), "%s;%d;%d", type, ballData2.horizontal, ballData2.vertical);
+    snprintf(encodedData1, sizeof(encodedData1), "%s;%d;%d|", type, ballData.horizontal, ballData.vertical);
+    snprintf(encodedData2, sizeof(encodedData2), "%s;%d;%d|", type, ballData2.horizontal, ballData2.vertical);
     // Envía la información de ball_vel a ambos sockets
     send(socket1, encodedData1, strlen(encodedData1), 0);
     send(socket2, encodedData2, strlen(encodedData2), 0);
