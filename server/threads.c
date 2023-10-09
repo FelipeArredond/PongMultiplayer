@@ -128,16 +128,16 @@ void *handle_game(void *args) {
     Data ballData;
 
     initBallVelocity(&ballData, 0);
-    sendBallVelocity(player1.socket, player2.socket, "ball_start", ballData);
+    sendBallVelocity(player1.socket, player2.socket, "bs", ballData);
     fflush(stdout);
 
 	while (1) {
         // Leer datos del cliente A
-        memset(bufferPlayer1, 0, sizeof(bufferPlayer1));
+        // memset(bufferPlayer1, 0, sizeof(bufferPlayer1));
         int bytesRead1 = read(player1.socket, bufferPlayer1, sizeof(bufferPlayer1));
 
         // Leer datos del cliente B
-        memset(bufferPlayer2, 0, sizeof(bufferPlayer2));
+        // memset(bufferPlayer2, 0, sizeof(bufferPlayer2));
         int bytesRead2 = read(player2.socket, bufferPlayer2, sizeof(bufferPlayer2));
 
         if(bytesRead1 == 0 || bytesRead2 == 0){
@@ -146,30 +146,30 @@ void *handle_game(void *args) {
         
         if (bytesRead1 > 0) {
             printf(format_string, bufferPlayer1);
-            if(strcmp(bufferPlayer1, "point_made") == 0){
+            if(strstr(bufferPlayer1, "pmd")!= NULL){
                 initBallVelocity(&ballData, (rand()%2));
-                sendBallVelocity(player1.socket, player2.socket, "ball_start", ballData);
+                sendBallVelocity(player1.socket, player2.socket, "bs", ballData);
+                memset(bufferPlayer1, 0, sizeof(bufferPlayer1));
                 continue;
             }
             // Enviar datos del cliente A al cliente B
             printf(format_string, "A -> B");
             fflush(stdout);
             send(player2.socket, bufferPlayer1, bytesRead1, 0);
-            memset(bufferPlayer1, 0, sizeof(bufferPlayer1));
         }
 
         if (bytesRead2 > 0) {
             //printf(format_string, bufferPlayer2);
-            if(strcmp(bufferPlayer2, "point_made") == 0){
+            if(strstr(bufferPlayer2, "pmd") != NULL){
                 initBallVelocity(&ballData, (rand()%2));
-                sendBallVelocity(player1.socket, player2.socket, "ball_start", ballData);
+                sendBallVelocity(player1.socket, player2.socket, "bs", ballData);
+                memset(bufferPlayer1, 0, sizeof(bufferPlayer2));
                 continue;
             }
             // Enviar datos del cliente B al cliente A
             printf(format_string, "B -> A");
             fflush(stdout);
             send(player1.socket, bufferPlayer2, bytesRead2, 0);
-            memset(bufferPlayer1, 0, sizeof(bufferPlayer2));
         }
     }
 
