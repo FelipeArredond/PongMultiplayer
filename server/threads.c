@@ -11,6 +11,7 @@
 #define SERVER_PORT 8080
 #define MAXLINE 4096
 #define format_string "%s\n"
+#define POINT_LIMIT 5
 
 typedef struct {
     int horizontal;
@@ -21,6 +22,7 @@ typedef struct
 {
     char address[MAXLINE + 1];
     int socket;
+    char name[24];
 } Player;
 
 typedef struct
@@ -114,7 +116,15 @@ void *handle_game(void *args) {
 
 	char bufferPlayer1[24] = { 0 };
     char bufferPlayer2[24] = { 0 };
-
+    // Leer nombres de usuario.
+    int bytesRead1 = read(player1.socket, bufferPlayer1, sizeof(bufferPlayer1));
+    int bytesRead2 = read(player2.socket, bufferPlayer2, sizeof(bufferPlayer2));
+    strcpy(player1.name, bufferPlayer1);
+    strcpy(player2.name, bufferPlayer2);
+    
+    send(player1.socket, player2.name, strlen(player2.name), 0);
+    send(player2.socket, player1.name, strlen(player1.name), 0);
+    sleep(2);
     // Establecer el socket en modo no bloqueante
     // int flags_a = fcntl(player1.socket, F_GETFL, 0);
     // fcntl(player1.socket, F_SETFL, flags_a | O_NONBLOCK);
@@ -123,22 +133,23 @@ void *handle_game(void *args) {
 
     fcntl(player1.socket, F_SETFL, O_NONBLOCK);
     fcntl(player2.socket, F_SETFL, O_NONBLOCK);
-
+    // Enviar la información de ball_vel a ambos sockets
     srand(time(NULL));
     Data ballData;
-
     initBallVelocity(&ballData, 0);
     sendBallVelocity(player1.socket, player2.socket, "bs", ballData);
+    printf("Game started!\n");
+    printf("Player 1: %s | VS | Player 2: %s", player1.name, player2.name);
     fflush(stdout);
 
-	while (1) {
+	while (game.scorePlayer1 < POINT_LIMIT && game.scorePlayer2 < POINT_LIMIT) {
         // Leer datos del cliente A
         // memset(bufferPlayer1, 0, sizeof(bufferPlayer1));
-        int bytesRead1 = read(player1.socket, bufferPlayer1, sizeof(bufferPlayer1));
+        bytesRead1 = read(player1.socket, bufferPlayer1, sizeof(bufferPlayer1));
 
         // Leer datos del cliente B
         // memset(bufferPlayer2, 0, sizeof(bufferPlayer2));
-        int bytesRead2 = read(player2.socket, bufferPlayer2, sizeof(bufferPlayer2));
+        bytesRead2 = read(player2.socket, bufferPlayer2, sizeof(bufferPlayer2));
 
         if(bytesRead1 == 0 || bytesRead2 == 0){
             break;
@@ -147,6 +158,7 @@ void *handle_game(void *args) {
         if (bytesRead1 > 0) {
             printf(format_string, bufferPlayer1);
             if(strstr(bufferPlayer1, "pmd")!= NULL){
+                game.scorePlayer2++;
                 initBallVelocity(&ballData, (rand()%2));
                 sendBallVelocity(player1.socket, player2.socket, "bs", ballData);
                 memset(bufferPlayer1, 0, sizeof(bufferPlayer1));
@@ -161,6 +173,7 @@ void *handle_game(void *args) {
         if (bytesRead2 > 0) {
             //printf(format_string, bufferPlayer2);
             if(strstr(bufferPlayer2, "pmd") != NULL){
+                game.scorePlayer1++;
                 initBallVelocity(&ballData, (rand()%2));
                 sendBallVelocity(player1.socket, player2.socket, "bs", ballData);
                 memset(bufferPlayer1, 0, sizeof(bufferPlayer2));
@@ -173,6 +186,10 @@ void *handle_game(void *args) {
         }
     }
 
+    //Enviar datos de fin de juego
+    send(player1.socket, "fg;;", strlen("fg;;"), 0);
+    send(player2.socket, "fg;;", strlen("fg;;"), 0);
+    
     shutdown(player1.socket, SHUT_RDWR);
     shutdown(player2.socket, SHUT_RDWR);
     return NULL;
