@@ -41,7 +41,7 @@ int main(int argc, char const *argv[])
 {
 
 
-    if (argc != 3) {
+    if (argc != 3 && argc != 4) {
         // Verificar si se proporcionaron los argumentos requeridos
         printf("Uso: %s <PORT> <Log File>\n", argv[0]);
         return 1; // Salir con un código de error
