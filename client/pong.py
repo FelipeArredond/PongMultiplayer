@@ -25,7 +25,7 @@ PAD_HEIGHT = 80
 HALF_PAD_WIDTH = PAD_WIDTH / 2
 HALF_PAD_HEIGHT = PAD_HEIGHT / 2
 ball_pos = [0,0]
-ball_vel = [0,0]
+ball_vel = [1.5,1.5]
 local_paddle_pos = [HALF_PAD_WIDTH - 1, HEIGHT/2]
 enemy_paddle_pos = [WIDTH +1 - HALF_PAD_WIDTH,HEIGHT/2]
 local_paddle_vel = 0
@@ -45,8 +45,8 @@ pygame.display.set_caption('Pong Game')
 
 server_response_event = threading.Event()
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-# server_address = ('34.238.40.118', 8080)
-server_address = ('localhost', 8080)
+server_address = ('54.174.122.196', 8080)
+#server_address = ('localhost', 8080)
 
 def close_threads():
     global THREADS_ARE_RUNNING
